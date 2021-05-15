@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import Login from './Components/Login'
+import axios from 'axios'
+import DashBoard from './Components/DashBoard';
+import { connect } from 'react-redux'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    axios.defaults.baseURL = 'https://localhost:44339';
+  }
+
+  render() {
+
+    if (typeof this.props.user === 'object' && Object.keys(this.props.user).length === 0) {
+      return <Login></Login>
+    }
+
+    const retrievedObject = localStorage.getItem('user');
+    if (typeof retrievedObject === 'string' && retrievedObject !== null) {
+      const user = JSON.parse(retrievedObject);
+      if (Object.keys(user).length === 0) {
+        return <Login />
+      }
+      else {
+        return <div>
+          <DashBoard />
+        </div>
+      }
+    }
+    return <Login />
+  }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return { user: state.user }
+}
+
+export default connect(
+  mapStateToProps,
+  null
+)(App)
